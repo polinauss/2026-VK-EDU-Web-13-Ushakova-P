@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tag{% endblock %}
+
+{% block content %}
+
+<h3>Tag: bender</h3>
+
+{% for i in "123" %}
+<div class="question">
+
+    <div class="left">
+        <img src="{% static 'img/avatar1.png' %}" class="avatar">
+
+        <div class="votes">
+            <div class="like-btn">▲</div>
+            <div class="count">5</div>
+            <div class="dislike-btn">▼</div>
+        </div>
+    </div>
+
+    <div class="right">
+        <a href="/question/" class="title">How to build a moon park ?</a>
+
+        <p>
+            Guys, i have trouble with a moon park.<br>
+            Can't find the black-jack...
+        </p>
+
+        <div class="info">
+            <a href="#">answer (3)</a>
+            <span>Tags:</span>
+            <a href="#">black-jack</a>
+            <a href="#">bender</a>
+        </div>
+    </div>
+
+</div>
+{% endfor %}
+
+<!-- ПАГИНАЦИЯ -->
+<div class="pagination">
+    <span class="page active">1</span>
+    <span class="page">2</span>
+    <span class="page">3</span>
+    <span class="page">...</span>
+    <span class="page">53</span>
+</div>
+
+{% endblock %}

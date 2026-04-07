@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}AskPupkin{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <a href="{% url 'index' %}"><h3>AskPupkin</h3></a>
+        <input type="text" placeholder="Search">
+        <a href="{% url 'ask' %}" class="ask-btn">ASK!</a>
+    </div>
+
+    <div class="header-right">
+        <a href="{% url 'login' %}">log in</a>
+        <a href="{% url 'register' %}">register</a>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="sidebar">
+        <h4>Popular Tags</h4>
+        <p>perl python TechnoPark</p>
+
+        <h4>Best Members</h4>
+        <ul>
+            <li>Mr. Freeman</li>
+            <li>Dr. House</li>
+            <li>Bender</li>
+        </ul>
+    </div>
+</div>
+
+<footer class="footer">© AskPupkin</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>
