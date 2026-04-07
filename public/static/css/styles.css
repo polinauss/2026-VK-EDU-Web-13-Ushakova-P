@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    font-family: Arial;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 2px solid black;
+}
+
+.layout {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    flex: 1;
+}
+
+.content {
+    flex: 3;
+}
+
+.sidebar {
+    flex: 1;
+}
+
+.footer {
+    border-top: 2px solid black;
+    padding: 10px;
+}
+
+.error {
+    color: red;
+}
+
+.hint {
+    font-size: 12px;
+    color: gray;
+}

@@ -1,13 +1,14 @@
 # 2026-VK-EDU-Web-13-Ushakova-P
 # Проект верстки для курса VK Web
-
+# AskPupkin
 # Страницы
- `/` - `public/index.html` (Главная со списком вопросов)
- `/question/` - `public/question.html` (Страница вопроса)
- `/ask/` - `public/ask.html` (Форма добавления вопроса)
- `/login/` - `public/login.html` (Форма входа)
- `/signup/` - `public/signup.html` (Форма регистрации)
- `/profile/` - `public/profile.html` (Редактирование профиля)
+
+## Страницы
+/question/ 
+/ask/ 
+/login/ 
+/register/ 
+/settings/
 
 # Как запустить
-Откройте `public/index.html` в браузере.
+python3 manage.py runserver
