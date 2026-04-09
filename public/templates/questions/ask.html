@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ask a Question{% endblock %}
+
+{% block content %}
+<h2>Ask a New Question</h2>
+
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if success %}
+    <div class="alert alert-success">
+        {{ success }}
+        <a href="{% url 'questions:index' %}" class="alert-link">Back to questions</a>
+    </div>
+{% endif %}
+
+<form method="post" action="{% url 'questions:ask' %}">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" required 
+               maxlength="200" placeholder="What's your question? Be specific.">
+        <small class="text-muted">Maximum 200 characters</small>
+        {% if form_errors.title %}
+            <div class="text-danger small">{{ form_errors.title }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Question Text</label>
+        <textarea name="text" class="form-control" rows="6" required 
+                  placeholder="Describe your problem in detail..."></textarea>
+        <small class="text-muted">Be as descriptive as possible to get better answers</small>
+        {% if form_errors.text %}
+            <div class="text-danger small">{{ form_errors.text }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tags</label>
+        <input type="text" name="tags" class="form-control" 
+               placeholder="python, django, javascript" 
+               aria-describedby="tagsHelp">
+        <small id="tagsHelp" class="text-muted">
+            Separate tags with commas. Maximum 5 tags. Only lowercase letters and hyphens.
+        </small>
+        {% if form_errors.tags %}
+            <div class="text-danger small">{{ form_errors.tags }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">Ask Question</button>
+        <a href="{% url 'questions:index' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </div>
+</form>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">Popular Tags</div>
+    <div class="card-body">
+        <a href="{% url 'questions:tag' 'python' %}" class="badge bg-primary me-1">python</a>
+        <a href="{% url 'questions:tag' 'django' %}" class="badge bg-success me-1">django</a>
+        <a href="{% url 'questions:tag' 'javascript' %}" class="badge bg-warning me-1">javascript</a>
+        <a href="{% url 'questions:tag' 'mysql' %}" class="badge bg-danger me-1">mysql</a>
+        <a href="{% url 'questions:tag' 'docker' %}" class="badge bg-info me-1">docker</a>
+    </div>
+</div>
+{% endblock %}

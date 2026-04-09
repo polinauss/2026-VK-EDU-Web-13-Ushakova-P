@@ -1,0 +1,24 @@
+{% load static %}
+
+<div class="card mb-4">
+    <div class="card-header">Popular Tags</div>
+    <div class="card-body">
+        <a href="{% url 'questions:tag' 'python' %}" class="badge bg-primary me-1">python</a>
+        <a href="{% url 'questions:tag' 'django' %}" class="badge bg-success me-1">django</a>
+        <a href="{% url 'questions:tag' 'MySQL' %}" class="badge bg-danger me-1">MySQL</a>
+        <a href="{% url 'questions:tag' 'bender' %}" class="badge bg-warning me-1">bender</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Best Members</div>
+    <div class="card-body">
+        <ul class="list-unstyled">
+            <li><a href="#">Mr. Freeman</a></li>
+            <li><a href="#">Dr. House</a></li>
+            <li><a href="#">Bender</a></li>
+            <li><a href="#">Queen Victoria</a></li>
+            <li><a href="#">V. Pupkin</a></li>
+        </ul>
+    </div>
+</div>

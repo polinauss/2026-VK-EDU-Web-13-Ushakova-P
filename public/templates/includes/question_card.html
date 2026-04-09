@@ -1,0 +1,25 @@
+{% load static %}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex">
+            <div class="me-3 text-center">
+                <img src="{% static 'img/avatar.jpg' %}" width="55" height="55" class="rounded">
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-success">↑</button>
+                    <span class="mx-1 fw-bold">{{ question.likes|default:5 }}</span>
+                    <button class="btn btn-sm btn-outline-danger">↓</button>
+                </div>
+            </div>
+            <div class="flex-grow-1">
+                <h5><a href="{% url 'questions:question' question.id %}">{{ question.title }}</a></h5>
+                <p>{{ question.text|truncatewords:25 }}</p>
+                <div>
+                    {% for tag in question.tags %}
+                        <a href="{% url 'questions:tag' tag %}" class="badge bg-secondary">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
