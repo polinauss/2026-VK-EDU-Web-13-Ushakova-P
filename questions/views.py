@@ -3,7 +3,6 @@ from django.urls import reverse
 from .utils import paginate
 import re
 
-# Разные IT-вопросы
 QUESTIONS = [
     {'id': 1,  'title': 'Как правильно настроить виртуальное окружение в Python?', 'text': 'Каждый раз при создании проекта venv ломается...', 'answers_count': 12, 'likes': 8,  'tags': ['python', 'venv']},
     {'id': 2,  'title': 'Почему Django не видит мои static файлы?', 'text': 'collectstatic отрабатывает, но в браузере 404...', 'answers_count': 7,  'likes': 15, 'tags': ['django', 'static']},
@@ -41,7 +40,7 @@ def question_detail(request, pk):
         {'text': 'Проверь настройки в settings.py: STATIC_URL и STATIC_ROOT', 'likes': 5, 'is_correct': False, 'author': 'PythonGuru', 'created_at': '1 day ago'},
     ]
     
-    # Пагинация для ответов
+    # Пагинация для ответов (передаём page_obj, но шаблон пока использует answers)
     page = paginate(answers, request, per_page=3)
     
     return render(request, 'questions/question.html', {
@@ -52,7 +51,6 @@ def question_detail(request, pk):
 
 def ask(request):
     if request.method == 'POST':
-        return render(request, 'questions/ask.html')
         title = request.POST.get('title', '').strip()
         text = request.POST.get('text', '').strip()
         tags = request.POST.get('tags', '').strip()
