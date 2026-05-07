@@ -28,3 +28,20 @@ pip install -r requirements.txt
 python3 manage.py migrate
 python3 manage.py runserver
 
+## Запуск через Docker
+
+1. Собрать образы:
+   ```bash
+   docker-compose build
+
+2. Запустить контейнеры в фоновом режиме:
+bash
+
+docker-compose up -d
+
+3. Применить миграции:
+bash
+
+docker-compose exec web python manage.py migrate
+
+4. Сайт доступен по адресу http://localhost:8000.
