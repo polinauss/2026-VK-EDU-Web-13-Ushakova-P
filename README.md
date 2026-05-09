@@ -28,3 +28,31 @@ pip install -r requirements.txt
 python3 manage.py migrate
 python3 manage.py runserver
 
+## Запуск в Docker
+1. Установите Docker и docker-compose.
+2. Скопируйте `.env.example` в `.env.docker` и заполните секреты.
+3. Выполните:
+
+docker-compose build
+docker-compose up
+text
+
+4. Приложение будет доступно на http://localhost:8000.
+
+## Локальный запуск
+
+1. Установите зависимости:
+
+pip install -r requirements.txt
+
+2. Создайте `.env.local` по образцу `.env.example` и выполните миграции:
+
+python manage.py migrate
+
+3. Наполните базу (опционально):
+
+python manage.py fill_db 100
+
+4. Запустите сервер:
+
+python manage.py runserver
