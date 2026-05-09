@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Question
+from .models import Question, Tag
 from .utils import paginate
 
 def index(request):
@@ -13,6 +13,8 @@ def hot(request):
     return render(request, 'questions/hot.html', {'page_obj': page})
 
 def tag(request, tag):
+    # Проверяем, что тег существует, иначе 404
+    tag_obj = get_object_or_404(Tag, name=tag)
     questions = Question.objects.by_tag(tag).prefetch_related('tags')
     page = paginate(questions, request, per_page=5)
     return render(request, 'questions/tag.html', {'page_obj': page, 'tag': tag})

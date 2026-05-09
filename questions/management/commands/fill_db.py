@@ -85,30 +85,42 @@ class Command(BaseCommand):
         created_answers = Answer.objects.all()[:ratio*100]
         self.stdout.write(f'Создано {ratio*100} ответов')
 
-        # 5. Лайки
+        # 5. Лайки вопросов
         q_likes = []
         max_q_likes = min(ratio * 200, ratio * 10 * ratio)
+        # Заранее собираем существующие пары в set
+        existing_q_likes = set(
+            QuestionLike.objects.values_list('user_id', 'question_id')
+        )
         i = 0
         while i < max_q_likes:
             user = random.choice(user_list)
             question = random.choice(question_list)
-            if not QuestionLike.objects.filter(user=user, question=question).exists():
+            if (user.id, question.id) not in existing_q_likes:
                 q_likes.append(QuestionLike(user=user, question=question))
+                existing_q_likes.add((user.id, question.id))  # обновляем set
                 i += 1
         QuestionLike.objects.bulk_create(q_likes, ignore_conflicts=True)
+        self.stdout.write(f'Создано лайков вопросов: {len(q_likes)}')
 
+        # 6. Лайки ответов
         a_likes = []
         answer_list = list(created_answers)
         max_a_likes = min(ratio * 200, ratio * 100 * ratio)
+        existing_a_likes = set(
+            AnswerLike.objects.values_list('user_id', 'answer_id')
+        )
         i = 0
         while i < max_a_likes:
             user = random.choice(user_list)
             answer = random.choice(answer_list)
-            if not AnswerLike.objects.filter(user=user, answer=answer).exists():
+            if (user.id, answer.id) not in existing_a_likes:
                 a_likes.append(AnswerLike(user=user, answer=answer))
+                existing_a_likes.add((user.id, answer.id))
                 i += 1
         AnswerLike.objects.bulk_create(a_likes, ignore_conflicts=True)
+        self.stdout.write(f'Создано лайков ответов: {len(a_likes)}')
 
         self.stdout.write(self.style.SUCCESS(
-            f'Наполнение завершено! Лайков: вопросов {len(q_likes)}, ответов {len(a_likes)}'
+            f'Наполнение завершено!'
         ))
