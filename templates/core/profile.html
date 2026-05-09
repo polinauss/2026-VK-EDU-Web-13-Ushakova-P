@@ -6,53 +6,60 @@
 {% block content %}
 <h2>Profile Settings</h2>
 
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+{% if success %}
+    <div class="alert alert-success">{{ success }}</div>
+{% endif %}
+
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-    
-    {% if success %}
-        <div class="alert alert-success">{{ success }}</div>
-    {% endif %}
-
+    <!-- Login (read only) -->
     <div class="mb-3">
         <label class="form-label">Login</label>
-        <input type="text" name="login" class="form-control" value="dr_pepper" readonly>
-        <small class="text-muted">Login cannot be changed</small>
+        <input type="text" class="form-control" value="{{ user.username }}" readonly>
     </div>
-
+    
+    <!-- Email -->
     <div class="mb-3">
         <label class="form-label">Email</label>
-        <input type="email" name="email" class="form-control" value="drpepper@mail.ru" required>
-        {% if form_errors.email %}
-            <div class="text-danger small">{{ form_errors.email }}</div>
-        {% endif %}
+        {{ form.email }}
+        {% for err in form.email.errors %}
+            <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
     </div>
-
+    
+    <!-- Nickname -->
     <div class="mb-3">
         <label class="form-label">NickName</label>
-        <input type="text" name="nickname" class="form-control" value="Dr. Pepper" required>
-        <small class="text-muted">How others will see you</small>
-        {% if form_errors.nickname %}
-            <div class="text-danger small">{{ form_errors.nickname }}</div>
-        {% endif %}
+        {{ form.nickname }}
+        {% for err in form.nickname.errors %}
+            <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
     </div>
-
+    
+    <!-- Avatar -->
     <div class="mb-4">
         <label class="form-label">Avatar</label>
         <div class="d-flex align-items-center gap-3 flex-wrap">
-            <img id="avatar-preview" src="{% static 'img/avatar.jpg' %}" width="120" height="120" class="rounded border object-fit-cover">
+            {% if user.profile.avatar %}
+                <img id="avatar-preview" src="{{ user.profile.avatar.url }}" width="120" height="120" class="rounded border object-fit-cover">
+            {% else %}
+                <img id="avatar-preview" src="{% static 'img/avatar.png' %}" width="120" height="120" class="rounded border object-fit-cover">
+            {% endif %}
             <div class="flex-grow-1">
-                <input type="file" id="avatar-input" name="avatar" accept="image/*" class="form-control">
-                <small class="text-muted">Click to choose a photo (JPG, PNG, max 5MB)</small>
+                {{ form.avatar }}
+                <small class="text-muted">JPG, PNG or GIF. Max 5MB</small>
             </div>
         </div>
     </div>
-
+    </div>
+    
     <hr>
-
+    
+    <!-- Password change (made separately) -->
     <h5 class="mb-3">Change Password</h5>
     <div class="mb-3">
         <label class="form-label">Current Password</label>
@@ -61,13 +68,12 @@
     <div class="mb-3">
         <label class="form-label">New Password</label>
         <input type="password" name="new_password" class="form-control">
-        <small class="text-muted">At least 8 characters</small>
     </div>
     <div class="mb-3">
         <label class="form-label">Confirm New Password</label>
         <input type="password" name="confirm_password" class="form-control">
     </div>
-
+    
     <div class="mt-4">
         <button type="submit" class="btn btn-dark">Save Changes</button>
         <a href="{% url 'questions:index' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
@@ -75,9 +81,8 @@
 </form>
 
 <script>
-    const avatarInput = document.getElementById('avatar-input');
+    const avatarInput = document.getElementById('id_avatar');
     const avatarPreview = document.getElementById('avatar-preview');
-    
     if (avatarInput) {
         avatarInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -91,10 +96,4 @@
         });
     }
 </script>
-
-<style>
-    .object-fit-cover {
-        object-fit: cover;
-    }
-</style>
 {% endblock %}

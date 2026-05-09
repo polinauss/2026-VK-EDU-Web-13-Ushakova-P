@@ -10,23 +10,20 @@
     <div class="alert alert-danger">{{ error }}</div>
 {% endif %}
 
-<form method="post" action="{% url 'core:login' %}">
+<form method="post">
     {% csrf_token %}
-    
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
     <div class="mb-3">
-        <label class="form-label">Login or Email</label>
-        <input type="text" name="login" class="form-control" required 
-               placeholder="Enter your login or email">
+        {{ form.username.label_tag }}
+        {{ form.username }}
     </div>
-    
     <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="password" name="password" class="form-control" required>
-        <a href="#" class="small">Forgot password?</a>
+        {{ form.password.label_tag }}
+        {{ form.password }}
     </div>
-    
     <button type="submit" class="btn btn-primary">Log In</button>
-    
     <p class="mt-3">
         Don't have an account? <a href="{% url 'core:signup' %}">Create one</a>
     </p>

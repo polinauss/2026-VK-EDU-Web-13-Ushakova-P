@@ -170,3 +170,9 @@ header .navbar-brand {
 footer {
     margin-top: auto;
 }
+
+.like-btn.active {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}

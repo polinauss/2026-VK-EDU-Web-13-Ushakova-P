@@ -1,82 +1,62 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout as auth_logout
-from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
+from .forms import LoginForm, SignupForm, ProfileForm
 
 def login_view(request):
     error = None
+    next_url = request.GET.get('next', '')
     if request.method == 'POST':
-        login = request.POST.get('login')
-        password = request.POST.get('password')
-        # Здесь будет проверка в БД
-        if login == 'dr_pepper' and password == 'password':
-            return redirect('questions:index')
-        else:
-            error = 'Invalid login or password'
-    
-    return render(request, 'core/login.html', {'error': error})
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts=None, require_https=request.is_secure()):
+                    return redirect(next_url)
+                return redirect('questions:index')
+            else:
+                error = 'Invalid login or password'
+    else:
+        form = LoginForm()
+    return render(request, 'core/login.html', {'form': form, 'error': error, 'next': next_url})
 
 def signup_view(request):
-    error = None
     if request.method == 'POST':
-        login = request.POST.get('login')
-        email = request.POST.get('email')
-        nickname = request.POST.get('nickname')
-        password = request.POST.get('password')
-        password2 = request.POST.get('password2')
-        
-        # Валидация
-        if not login or not email or not nickname or not password:
-            error = 'All fields are required'
-        elif password != password2:
-            error = 'Passwords do not match'
-        elif len(password) < 6:
-            error = 'Password must be at least 6 characters'
-        else:
-            # Здесь будет создание пользователя в БД
-            return redirect('core:login')
-    
-    return render(request, 'core/signup.html', {'error': error})
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('questions:index')
+    else:
+        form = SignupForm()
+    return render(request, 'core/signup.html', {'form': form})
 
+@login_required
 def profile_view(request):
     success = None
     error = None
-    form_errors = {}
-    
     if request.method == 'POST':
-        email = request.POST.get('email')
-        nickname = request.POST.get('nickname')
-        current_password = request.POST.get('current_password')
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
-        
-        # Валидация
-        if not email:
-            form_errors['email'] = 'Email is required'
-        elif '@' not in email:
-            form_errors['email'] = 'Invalid email address'
-            
-        if not nickname:
-            form_errors['nickname'] = 'Nickname is required'
-            
-        # Проверка пароля если меняют
-        if new_password:
-            if not current_password:
-                error = 'Current password is required to change password'
-            elif len(new_password) < 6:
-                error = 'New password must be at least 6 characters'
-            elif new_password != confirm_password:
-                error = 'New passwords do not match'
-            else:
-                success = 'Profile updated successfully! Password has been changed.'
-        elif not error:
+        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile, user=request.user)
+        if form.is_valid():
+            form.save()
             success = 'Profile updated successfully!'
-    
+        else:
+            error = 'Please correct the errors below.'
+    else:
+        form = ProfileForm(instance=request.user.profile, user=request.user)
     return render(request, 'core/profile.html', {
+        'form': form,
         'success': success,
-        'error': error,
-        'form_errors': form_errors
+        'error': error
     })
 
 def logout_view(request):
-    auth_logout(request)
+    logout(request)
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
     return redirect('questions:index')

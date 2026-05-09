@@ -6,51 +6,34 @@
 {% block content %}
 <h2>Ask a New Question</h2>
 
-{% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-{% endif %}
-
-{% if success %}
-    <div class="alert alert-success">
-        {{ success }}
-        <a href="{% url 'questions:index' %}" class="alert-link">Back to questions</a>
-    </div>
-{% endif %}
-
 <form method="post" action="{% url 'questions:ask' %}">
     {% csrf_token %}
     
     <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input type="text" name="title" class="form-control" required 
-               maxlength="200" placeholder="What's your question? Be specific.">
+        <label class="form-label">{{ form.title.label }}</label>
+        {{ form.title }}
+        {% for err in form.title.errors %}
+            <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
         <small class="text-muted">Maximum 200 characters</small>
-        {% if form_errors.title %}
-            <div class="text-danger small">{{ form_errors.title }}</div>
-        {% endif %}
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Question Text</label>
-        <textarea name="text" class="form-control" rows="6" required 
-                  placeholder="Describe your problem in detail..."></textarea>
+        <label class="form-label">{{ form.text.label }}</label>
+        {{ form.text }}
+        {% for err in form.text.errors %}
+            <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
         <small class="text-muted">Be as descriptive as possible to get better answers</small>
-        {% if form_errors.text %}
-            <div class="text-danger small">{{ form_errors.text }}</div>
-        {% endif %}
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Tags</label>
-        <input type="text" name="tags" class="form-control" 
-               placeholder="python, django, javascript" 
-               aria-describedby="tagsHelp">
-        <small id="tagsHelp" class="text-muted">
-            Separate tags with commas. Maximum 5 tags. Only lowercase letters and hyphens.
-        </small>
-        {% if form_errors.tags %}
-            <div class="text-danger small">{{ form_errors.tags }}</div>
-        {% endif %}
+        <label class="form-label">{{ form.tags.label }}</label>
+        {{ form.tags }}
+        {% for err in form.tags.errors %}
+            <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
+        <small class="text-muted">{{ form.tags.help_text }}</small>
     </div>
 
     <div class="mt-4">
