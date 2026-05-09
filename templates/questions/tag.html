@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Тег: {{ tag }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Tag: <span class="text-primary">{{ tag }}</span></h2>
+
+{% for question in page_obj %}
+    {% include "includes/question_card.html" with question=question %}
+{% endfor %}
+
+{% include "includes/paginator.html" %}
+{% endblock %}
