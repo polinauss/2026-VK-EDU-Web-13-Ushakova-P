@@ -1,22 +1,18 @@
-version: '3.9'
-
 services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: askpupkin
+      POSTGRES_USER: askpupkin_user
+      POSTGRES_PASSWORD: secret
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
-    env_file:
-      - .env.docker
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
@@ -25,8 +21,13 @@ services:
       - db
     networks:
       - app-network
-    env_file:
-      - .env.docker
+    environment:
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: askpupkin
+      DB_USER: askpupkin_user
+      DB_PASSWORD: secret
+      DB_HOST: db
+      DB_PORT: 5432
 
 volumes:
   postgres_data:

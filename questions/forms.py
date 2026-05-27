@@ -3,9 +3,7 @@ from .models import Question, Answer, Tag
 
 class QuestionForm(forms.ModelForm):
     tags = forms.CharField(
-        label='Tags',
         required=False,
-        help_text='Separate tags with commas. Maximum 5 tags.',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'python, django, javascript'})
     )
 
@@ -13,8 +11,8 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = ['title', 'text']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "What's your question? Be specific."}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'Describe your problem in detail...'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
         }
 
     def clean_tags(self):
@@ -23,9 +21,8 @@ class QuestionForm(forms.ModelForm):
         if len(tags) > 5:
             raise forms.ValidationError('Maximum 5 tags allowed.')
         for tag_name in tags:
-            # Разрешены только буквы, цифры и дефисы
             if not tag_name.replace('-', '').isalnum():
-                raise forms.ValidationError(f'Invalid tag: "{tag_name}". Use only letters, numbers, and hyphens.')
+                raise forms.ValidationError(f'Invalid tag: "{tag_name}".')
         return tags
 
     def save_tags(self, question):
@@ -38,7 +35,6 @@ class QuestionForm(forms.ModelForm):
 
     def save(self, commit=True):
         question = super().save(commit=False)
-        # author устанавливается во view
         if commit:
             question.save()
             self.save_tags(question)
@@ -49,5 +45,5 @@ class AnswerForm(forms.ModelForm):
         model = Answer
         fields = ['text']
         widgets = {
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter your answer here.'})
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your answer here...'})
         }

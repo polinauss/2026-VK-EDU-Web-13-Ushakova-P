@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.core.exceptions import PermissionDenied
 from .models import Question, Answer, Tag, QuestionLike, AnswerLike
 from .forms import QuestionForm, AnswerForm
 from .utils import paginate
@@ -57,29 +59,84 @@ def ask(request):
         form = QuestionForm()
     return render(request, 'questions/ask.html', {'form': form})
 
+# ------------------ Лайки/дизлайки ------------------
+def _toggle_like(model_like, obj, user, like=True):
+    """
+    model_like: QuestionLike или AnswerLike
+    obj: Question или Answer
+    user: пользователь
+    like: True - поставить лайк, False - дизлайк (в данной реализации дизлайк просто убирает лайк)
+    """
+    # Проверка, что тип действия валиден
+    if like not in (True, False):
+        return None
 
+    liked = model_like.objects.filter(user=user, **{obj.__class__.__name__.lower(): obj}).exists()
+
+    if like and not liked:
+        # поставить лайк
+        model_like.objects.create(user=user, **{obj.__class__.__name__.lower(): obj})
+        obj.likes_count += 1
+        obj.save()
+        return {'likes_count': obj.likes_count, 'liked': True}
+    elif not like and liked:
+        # убрать лайк (дизлайк)
+        model_like.objects.filter(user=user, **{obj.__class__.__name__.lower(): obj}).delete()
+        obj.likes_count -= 1
+        obj.save()
+        return {'likes_count': obj.likes_count, 'liked': False}
+    else:
+        # уже в нужном состоянии
+        return {'likes_count': obj.likes_count, 'liked': liked}
+
+@require_POST
 @login_required
 def question_like(request, pk):
     question = get_object_or_404(Question, pk=pk)
-    liked = QuestionLike.objects.filter(user=request.user, question=question).exists()
-    if liked:
-        QuestionLike.objects.filter(user=request.user, question=question).delete()
-        question.likes_count -= 1
-    else:
-        QuestionLike.objects.create(user=request.user, question=question)
-        question.likes_count += 1
-    question.save()
-    return JsonResponse({'likes_count': question.likes_count, 'liked': not liked})
+    like = request.POST.get('like')  # '1' или '0'
+    if like not in ('0', '1'):
+        return JsonResponse({'error': 'Invalid like parameter'}, status=400)
+    result = _toggle_like(QuestionLike, question, request.user, like == '1')
+    if result is None:
+        return JsonResponse({'error': 'Invalid action'}, status=400)
+    return JsonResponse(result)
 
+@require_POST
 @login_required
 def answer_like(request, pk):
     answer = get_object_or_404(Answer, pk=pk)
-    liked = AnswerLike.objects.filter(user=request.user, answer=answer).exists()
-    if liked:
-        AnswerLike.objects.filter(user=request.user, answer=answer).delete()
-        answer.likes_count -= 1
+    like = request.POST.get('like')  # '1' или '0'
+    if like not in ('0', '1'):
+        return JsonResponse({'error': 'Invalid like parameter'}, status=400)
+    result = _toggle_like(AnswerLike, answer, request.user, like == '1')
+    if result is None:
+        return JsonResponse({'error': 'Invalid action'}, status=400)
+    return JsonResponse(result)
+
+# ------------------ Отметка правильного ответа ------------------
+@require_POST
+@login_required
+def answer_correct(request, pk):
+    answer = get_object_or_404(Answer, pk=pk)
+    question = answer.question
+
+    # Проверка, что пользователь — автор вопроса
+    if request.user != question.author:
+        return JsonResponse({'error': 'Только автор вопроса может отмечать правильный ответ.'}, status=403)
+
+    # Сбрасываем предыдущий правильный ответ, если есть
+    if answer.is_correct:
+        answer.is_correct = False
+        message = 'Правильный ответ снят.'
     else:
-        AnswerLike.objects.create(user=request.user, answer=answer)
-        answer.likes_count += 1
+        # снимаем пометку с других ответов
+        Answer.objects.filter(question=question, is_correct=True).update(is_correct=False)
+        answer.is_correct = True
+        message = 'Ответ отмечен как правильный.'
+
     answer.save()
-    return JsonResponse({'likes_count': answer.likes_count, 'liked': not liked})
+    return JsonResponse({
+        'is_correct': answer.is_correct,
+        'answer_id': answer.id,
+        'message': message
+    })

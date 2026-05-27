@@ -14,45 +14,83 @@
 - Боковая панель с популярными тегами и лучшими участниками
 
 ## Технологии
-- Python 3.10+
+- Python 3.12+
 - Django 5.1.1
 - Bootstrap 5 (адаптивная вёрстка)
-- SQLite (по умолчанию, можно заменить на PostgreSQL/MySQL)
+- PostgreSQL / SQLite
 
-# Как запустить
-### Локально
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python3 manage.py migrate
-python3 manage.py runserver
+## Настройка окружения
 
-## Запуск в Docker
-1. Установите Docker и docker-compose.
-2. Скопируйте `.env.example` в `.env.docker` и заполните секреты.
-3. Выполните:
+### Для запуска в Docker (`.env.docker`)
+Создайте файл `.env.docker` в корне проекта с конфигурацией для связи контейнера Django и СУБД PostgreSQL:
 
-docker-compose build
-docker-compose up
-text
+```env
+SECRET_KEY=django-insecure-askpupkin-2026-ushakova
+DEBUG=True
+ALLOWED_HOSTS=*
 
-4. Приложение будет доступно на http://localhost:8000.
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=askpupkin
+DB_USER=askpupkin_user
+DB_PASSWORD=secret
+DB_HOST=db
+DB_PORT=5432
 
-## Локальный запуск
+## Инструкция по запуску
+###Вариант 1: Запуск через Docker Compose (Рекомендуемый)
 
-1. Установите зависимости:
+Этот метод автоматически развернет изолированные контейнеры для веб-сервера и базы данных PostgreSQL.
+    Убедитесь, что на компьютере установлены Docker и Docker Compose.
+    Подготовьте файл .env.docker в корне проекта (см. раздел выше).
+    Запустите сборку и старт контейнеров:
 
-pip install -r requirements.txt
+docker-compose up --build
 
-2. Создайте `.env.local` по образцу `.env.example` и выполните миграции:
+Миграции применятся автоматически. Приложение начнет принимать запросы по адресу: http://localhost:8000.
+##Вариант 2: Локальный запуск (Разработка на SQLite)
 
-python manage.py migrate
+Подходит для быстрого дебага и редактирования кода без использования виртуализации.
+    Создайте и активируйте виртуальное окружение Python:
+        Для Windows:
+        python -m venv venv
+        venv\Scripts\activate
 
-3. Наполните базу (опционально):
+        Для Linux / macOS:
+        python3 -m venv venv
+        source venv/bin/activate
 
-python manage.py fill_db 100
+    Установите пакеты и зависимости:
+    pip install -r requirements.txt
 
-4. Запустите сервер:
+    Подготовьте конфигурацию окружения:
+    Убедитесь, что локальный файл окружения .env.local настроен.
+    Выполните миграции для создания таблиц базы данных:
+    python manage.py migrate
 
-python manage.py runserver
+    Запустите встроенный сервер разработки Django:
+    python manage.py runserver
+
+    Перейдите в браузере по адресу: http://127.0.0.1:8000/.
+## Заполнение базы данных фейковыми данными
+
+В проект интегрирован кастомный скрипт генерации данных на базе библиотеки Faker. Он генерирует пользователей, профили, вопросы, ответы к ним, проставляет случайные теги и распределяет лайки.
+
+Для запуска генератора выполните команду в консоли (где число 10 — коэффициент масштабирования данных):
+
+    При локальном запуске (без Docker):
+    python manage.py fill_db 10
+
+    При запущенном Docker-окружении:
+    docker-compose exec web python manage.py fill_db 10
+    
+##.env.docker:
+SECRET_KEY=django-insecure-askpupkin-2026-ushakova
+DEBUG=True
+ALLOWED_HOSTS=*
+
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=askpupkin
+DB_USER=askpupkin_user
+DB_PASSWORD=secret
+DB_HOST=db
+DB_PORT=5432

@@ -3,31 +3,22 @@ from django.contrib.auth.models import User
 from .managers import QuestionManager
 
 class Tag(models.Model):
-    name = models.CharField('Тег', max_length=50, unique=True)
-    created_at = models.DateTimeField('Создан', auto_now_add=True)
-
-    class Meta:
-        verbose_name = 'Тег'
-        verbose_name_plural = 'Теги'
+    name = models.CharField(max_length=50, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
 class Question(models.Model):
-    title = models.CharField('Заголовок', max_length=200)
-    text = models.TextField('Текст вопроса')
+    title = models.CharField(max_length=200)
+    text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions')
     tags = models.ManyToManyField(Tag, related_name='questions', blank=True)
-    created_at = models.DateTimeField('Создан', auto_now_add=True)
-    updated_at = models.DateTimeField('Обновлён', auto_now=True)
-    likes_count = models.IntegerField('Рейтинг', default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    likes_count = models.IntegerField(default=0)
 
     objects = QuestionManager()
-
-    class Meta:
-        verbose_name = 'Вопрос'
-        verbose_name_plural = 'Вопросы'
-        ordering = ['-created_at']
 
     def __str__(self):
         return self.title
@@ -39,17 +30,13 @@ class Question(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answers')
-    text = models.TextField('Текст ответа')
-    is_correct = models.BooleanField('Правильный', default=False)
-    created_at = models.DateTimeField('Создан', auto_now_add=True)
-    likes_count = models.IntegerField('Рейтинг', default=0)
-
-    class Meta:
-        verbose_name = 'Ответ'
-        verbose_name_plural = 'Ответы'
+    text = models.TextField()
+    is_correct = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    likes_count = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'Ответ {self.id} от {self.author.username}'
+        return f'Answer {self.id} by {self.author.username}'
 
 class QuestionLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -58,8 +45,6 @@ class QuestionLike(models.Model):
 
     class Meta:
         unique_together = ('user', 'question')
-        verbose_name = 'Лайк вопроса'
-        verbose_name_plural = 'Лайки вопросов'
 
 class AnswerLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -68,5 +53,3 @@ class AnswerLike(models.Model):
 
     class Meta:
         unique_together = ('user', 'answer')
-        verbose_name = 'Лайк ответа'
-        verbose_name_plural = 'Лайки ответов'

@@ -1,7 +1,11 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+load_dotenv('/home/polinaus/VK/2026-VK-EDU-Web-13-Ushakova-P/.env.local')
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-askpupkin-2026-ushakova')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
@@ -52,14 +56,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+##DATABASES = {
+##    'default': {
+##        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
+##        'NAME': os.environ.get('DB_NAME', 'askpupkin'),
+##        'USER': os.environ.get('DB_USER', 'askpupkin_user'),
+##        'PASSWORD': os.environ.get('DB_PASSWORD', 'secret'),
+##        'HOST': os.environ.get('DB_HOST', 'localhost'),
+##        'PORT': os.environ.get('DB_PORT', '5432'),
+##    }
+##}
+
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': os.environ.get('DB_NAME', 'askpupkin'),
-        'USER': os.environ.get('DB_USER', 'askpupkin_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'secret'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

@@ -25,38 +25,16 @@
                         <a href="{% url 'questions:tag' tag.name %}" class="badge bg-secondary">{{ tag.name }}</a>
                     {% endfor %}
                 </p>
-                <p class="text-muted">asked by {{ question.author.username }}</p>
+                <p class="text-muted">спросил {{ question.author.username }}</p>
             </div>
         </div>
     </div>
 </div>
 
-<h4>Answers ({{ question.answers.count }})</h4>
+<h4>Ответы ({{ question.answers.count }})</h4>
 
 {% for answer in answers %}
-    <div class="card mb-3" id="answer-{{ answer.id }}">
-        <div class="card-body">
-            <div class="d-flex">
-                <div class="me-3 text-center">
-                    {% if answer.author.profile.avatar %}
-                        <img src="{{ answer.author.profile.avatar.url }}" width="50" height="50" class="rounded">
-                    {% else %}
-                        <img src="{% static 'img/avatar.png' %}" width="50" height="50" class="rounded">
-                    {% endif %}
-                    <div class="mt-2">
-                        <span class="badge bg-success">{{ answer.likes_count }}</span>
-                    </div>
-                </div>
-                <div class="flex-grow-1">
-                    <p>{{ answer.text }}</p>
-                    {% if answer.is_correct %}
-                        <span class="text-success fw-bold">✔ Correct!</span>
-                    {% endif %}
-                    <p class="text-muted small">answered by {{ answer.author.username }} – {{ answer.created_at|timesince }} ago</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include "includes/answer_card.html" with answer=answer %}
 {% empty %}
     <p class="text-muted">Пока нет ни одного ответа к этому вопросу.</p>
 {% endfor %}
@@ -64,16 +42,16 @@
 {% include "includes/paginator.html" %}
 
 {% if user.is_authenticated %}
-    <h5 class="mt-4">Your Answer</h5>
+    <h5 class="mt-4">Ваш ответ</h5>
     <form method="post">
         {% csrf_token %}
         {{ form.text }}
         {% for err in form.text.errors %}
             <div class="text-danger small">{{ err }}</div>
         {% endfor %}
-        <button type="submit" class="btn btn-dark mt-3">Answer</button>
+        <button type="submit" class="btn btn-dark mt-3">Ответить</button>
     </form>
 {% else %}
-    <p class="mt-4 text-muted"><a href="{% url 'core:login' %}?next={{ request.path }}">Log in</a> to answer.</p>
+    <p class="mt-4 text-muted"><a href="{% url 'core:login' %}?next={{ request.path }}">Войдите</a>, чтобы ответить.</p>
 {% endif %}
 {% endblock %}

@@ -10,15 +10,17 @@
                 {% endif %}
                 <div class="mt-2">
                     {% if user.is_authenticated %}
-                        <button class="btn btn-sm btn-outline-danger like-btn" data-id="{{ question.id }}" data-type="question">
+                        <button class="btn btn-sm btn-outline-success like-btn" data-id="{{ question.id }}" data-type="question" data-action="like" title="Нравится">
                             ❤
                         </button>
                         <span class="mx-1 fw-bold likes-count">{{ question.likes_count }}</span>
-                    {% else %}
-                        <button class="btn btn-sm btn-outline-danger" disabled title="Войдите, чтобы оценить">
-                            ❤
+                        <button class="btn btn-sm btn-outline-danger dislike-btn" data-id="{{ question.id }}" data-type="question" data-action="dislike" title="Не нравится">
+                            ✕
                         </button>
+                    {% else %}
+                        <button class="btn btn-sm btn-outline-success" disabled title="Войдите, чтобы оценить">❤</button>
                         <span class="mx-1 fw-bold">{{ question.likes_count }}</span>
+                        <button class="btn btn-sm btn-outline-danger" disabled title="Войдите, чтобы оценить">✕</button>
                     {% endif %}
                 </div>
             </div>
